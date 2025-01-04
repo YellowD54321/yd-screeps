@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "baseUrl": "src",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "types": ["node", "screeps"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
