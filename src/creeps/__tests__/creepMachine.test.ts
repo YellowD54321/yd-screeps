@@ -1,5 +1,5 @@
 import { interpret } from 'xstate';
-import { creepMachine } from '../creepMachine';
+import { creepMachine } from '@/creeps/creepMachine';
 
 describe('CreepMachine', () => {
   it('should initialize in idle state', () => {

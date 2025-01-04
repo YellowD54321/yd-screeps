@@ -1,5 +1,5 @@
-import { loop } from './loop';
-import { log } from './utils/logger';
+import { loop } from '@/loop';
+import { log } from '@/utils/logger';
 
 // Game 對象會在遊戲環境中被注入
 export const TICK_START = Game.time;

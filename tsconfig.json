@@ -7,6 +7,9 @@
     "outDir": "dist",
     "sourceMap": true,
     "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "types": ["node", "screeps", "jest"]
