@@ -1,3 +1,3 @@
-export function loop(): void {
+export function runGame(): void {
   console.log(`Current game tick: ${Game.time}`);
 }
