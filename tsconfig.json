@@ -9,7 +9,7 @@
     "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "types": ["node", "screeps"]
+    "types": ["node", "screeps", "jest"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
