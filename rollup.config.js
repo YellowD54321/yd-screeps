@@ -1,9 +1,9 @@
-const resolve = require('@rollup/plugin-node-resolve');
-const commonjs = require('@rollup/plugin-commonjs');
-const typescript = require('rollup-plugin-typescript2');
-const clear = require('rollup-plugin-clear');
-const fs = require('fs');
-const path = require('path');
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import typescript from 'rollup-plugin-typescript2';
+import clear from 'rollup-plugin-clear';
+import fs from 'fs';
+import path from 'path';
 
 // 自定義插件：複製到私人伺服器
 const copyToPrivateServer = () => {
@@ -32,7 +32,7 @@ const copyToPrivateServer = () => {
   };
 };
 
-module.exports = {
+export default {
   input: 'src/main.ts',
   output: {
     file: 'dist/main.js',
