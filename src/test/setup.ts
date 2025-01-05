@@ -1,4 +1,4 @@
-import { mockGame, mockMemory } from './mockGame';
+import { mockGame, mockMemory } from '@/test/mockGame';
 
 // Add mock game environment to global scope
 Object.assign(global, mockGame);

@@ -1,4 +1,4 @@
-import { BaseStructure } from '../BaseStructure';
+import { BaseStructure } from '@/structures/base/BaseStructure';
 
 class TestStructure extends BaseStructure {
   constructor(structure: Structure) {

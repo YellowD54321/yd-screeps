@@ -1,4 +1,4 @@
-import { SpawnController } from './structures/spawn/SpawnController';
+import { SpawnController } from '@/structures/spawn/SpawnController';
 
 export function runGame(): void {
   console.log(`Current game tick: ${Game.time}`);

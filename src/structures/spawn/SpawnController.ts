@@ -1,4 +1,4 @@
-import { Spawn } from './Spawn';
+import { Spawn } from '@/structures/spawn/Spawn';
 
 export class SpawnController {
   private room: Room;

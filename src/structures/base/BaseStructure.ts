@@ -1,4 +1,4 @@
-import { IStructure } from './IStructure';
+import { IStructure } from '@/structures/base/IStructure';
 
 export abstract class BaseStructure implements IStructure {
   protected id: Id<Structure>;

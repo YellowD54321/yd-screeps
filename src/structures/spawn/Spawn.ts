@@ -1,4 +1,4 @@
-import { BaseStructure } from '../base/BaseStructure';
+import { BaseStructure } from '@/structures/base/BaseStructure';
 
 export class Spawn extends BaseStructure {
   private spawn: StructureSpawn;
