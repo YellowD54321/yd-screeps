@@ -3,7 +3,8 @@
 ## Code Style
 
 - All comments should be in English
-- import path should be absolute path
+- Import path should be absolute path
+- Don't add comments when you generate code
 
 ## Test Driven Development (TDD) Rules
 
