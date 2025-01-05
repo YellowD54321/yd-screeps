@@ -1,5 +1,10 @@
 # Cursor Rules
 
+## Code Style
+
+- All comments should be in English
+- import path should be absolute path
+
 ## Test Driven Development (TDD) Rules
 
 ### Basic Requirements
