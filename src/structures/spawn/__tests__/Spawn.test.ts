@@ -1,7 +1,11 @@
 import { Spawn } from '@/structures/spawn/Spawn';
 
-type MinerMemory = { role: 'miner' };
-type SpawnOptionsWithMemory = SpawnOptions & { memory: MinerMemory };
+type SpawnOptionsWithMemory = SpawnOptions & {
+  memory: {
+    role: CreepRole.MINER;
+    state: CreepState;
+  };
+};
 
 describe('Spawn', () => {
   const spawnCreep = jest.fn<
@@ -61,7 +65,7 @@ describe('Spawn', () => {
       expect(bodyParts).toContain(MOVE);
 
       expect(name).toMatch(/^Miner_\d+$/);
-      expect(options.memory.role).toBe('miner');
+      expect(options.memory.role).toBe(CreepRole.MINER);
     });
   });
 });

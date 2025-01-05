@@ -1,4 +1,5 @@
 import { SpawnController } from '@/structures/spawn/SpawnController';
+import { CreepController } from '@/creeps/CreepController';
 
 export function runGame(): void {
   console.log(`Current game tick: ${Game.time}`);
@@ -8,4 +9,7 @@ export function runGame(): void {
     const spawnController = new SpawnController(room);
     spawnController.run();
   }
+
+  const creepController = new CreepController();
+  creepController.run();
 }

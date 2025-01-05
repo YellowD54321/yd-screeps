@@ -12,8 +12,14 @@ jest.mock('@/structures/spawn/Spawn', () => {
   };
 });
 
+interface CreepCounts {
+  totalCount: number;
+  minerCount?: number;
+}
+
 class MockRoomBuilder {
   private creepsCount: number = 0;
+  private minersCount: number = 0;
   private readonly mockRoom: Room;
   private readonly mockSpawn: StructureSpawn;
 
@@ -24,12 +30,20 @@ class MockRoomBuilder {
     } as unknown as Room;
   }
 
-  withCreeps(count: number): this {
-    this.creepsCount = count;
+  withCreeps({ totalCount, minerCount = 0 }: CreepCounts): this {
+    this.creepsCount = totalCount;
+    this.minersCount = minerCount;
     (this.mockRoom.find as jest.Mock).mockImplementation((type: FindConstant) => {
       switch (type) {
         case FIND_MY_CREEPS:
-          return Array(this.creepsCount).fill({});
+          return [
+            ...Array(this.minersCount).fill({
+              memory: { role: 'miner' },
+            }),
+            ...Array(this.creepsCount - this.minersCount).fill({
+              memory: { role: 'other' },
+            }),
+          ];
         case FIND_MY_SPAWNS:
           return [this.mockSpawn];
         default:
@@ -57,36 +71,43 @@ describe('SpawnController', () => {
 
   describe('Creep Count Check', () => {
     it('should return true when creep count is less than 5', () => {
-      const { room } = new MockRoomBuilder().withCreeps(3).build();
+      const { room } = new MockRoomBuilder().withCreeps({ totalCount: 3, minerCount: 1 }).build();
       spawnController = new SpawnController(room);
       expect(spawnController.shouldSpawnCreep()).toBe(true);
     });
 
     it('should return false when creep count is 5 or more', () => {
-      const { room } = new MockRoomBuilder().withCreeps(5).build();
+      const { room } = new MockRoomBuilder().withCreeps({ totalCount: 5, minerCount: 1 }).build();
       spawnController = new SpawnController(room);
       expect(spawnController.shouldSpawnCreep()).toBe(false);
     });
   });
 
   describe('Spawn Decision', () => {
-    it('should spawn creep when conditions are met', () => {
-      const { room } = new MockRoomBuilder().withCreeps(3).build();
+    it('should spawn miner when conditions are met', () => {
+      const { room } = new MockRoomBuilder().withCreeps({ totalCount: 3, minerCount: 1 }).build();
       spawnController = new SpawnController(room);
       spawnController.run();
       expect(mockSpawnMiner).toHaveBeenCalled();
     });
 
-    it('should not spawn creep when energy is insufficient', () => {
+    it('should not spawn miner when energy is insufficient', () => {
       mockHasEnoughEnergy.mockReturnValue(false);
-      const { room } = new MockRoomBuilder().withCreeps(3).build();
+      const { room } = new MockRoomBuilder().withCreeps({ totalCount: 3, minerCount: 1 }).build();
       spawnController = new SpawnController(room);
       spawnController.run();
       expect(mockSpawnMiner).not.toHaveBeenCalled();
     });
 
-    it('should not spawn creep when creep count is sufficient', () => {
-      const { room } = new MockRoomBuilder().withCreeps(5).build();
+    it('should not spawn miner when miner count is sufficient', () => {
+      const { room } = new MockRoomBuilder().withCreeps({ totalCount: 3, minerCount: 2 }).build();
+      spawnController = new SpawnController(room);
+      spawnController.run();
+      expect(mockSpawnMiner).not.toHaveBeenCalled();
+    });
+
+    it('should not spawn miner when total creep count is at maximum', () => {
+      const { room } = new MockRoomBuilder().withCreeps({ totalCount: 5, minerCount: 1 }).build();
       spawnController = new SpawnController(room);
       spawnController.run();
       expect(mockSpawnMiner).not.toHaveBeenCalled();

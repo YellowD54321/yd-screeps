@@ -21,7 +21,8 @@ export class Spawn extends BaseStructure {
   public spawnMiner(): ScreepsReturnCode {
     return this.spawn.spawnCreep(this.MINER_BODY, `Miner_${Game.time}`, {
       memory: {
-        role: 'miner',
+        role: CreepRole.MINER,
+        state: CreepState.HARVESTING,
       },
     });
   }
