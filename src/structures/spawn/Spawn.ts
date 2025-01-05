@@ -11,7 +11,7 @@ export class Spawn extends BaseStructure {
   }
 
   public run(): void {
-    // Basic implementation, can be extended later
+    // TODO: finish run method
   }
 
   public hasEnoughEnergy(): boolean {

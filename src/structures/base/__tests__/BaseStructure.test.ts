@@ -1,18 +1,16 @@
 import { BaseStructure } from '../BaseStructure';
 
-// 創建一個測試用的具體類別
 class TestStructure extends BaseStructure {
   constructor(structure: Structure) {
     super(structure);
   }
 
   public run(): void {
-    // 測試用實現
+    // TODO: finish run method
   }
 }
 
 describe('BaseStructure', () => {
-  // 模擬 Structure 物件
   const mockStructure = {
     id: 'test_id' as Id<Structure>,
     pos: {

@@ -1,11 +1,9 @@
 import { Spawn } from '@/structures/spawn/Spawn';
 
-// Define custom types for testing
 type MinerMemory = { role: 'miner' };
 type SpawnOptionsWithMemory = SpawnOptions & { memory: MinerMemory };
 
 describe('Spawn', () => {
-  // Mock StructureSpawn with proper typing
   const spawnCreep = jest.fn<
     ScreepsReturnCode,
     [BodyPartConstant[], string, SpawnOptionsWithMemory]
@@ -58,12 +56,12 @@ describe('Spawn', () => {
 
       const [bodyParts, name, options] = spawnCreep.mock.calls[0] || [];
       expect(bodyParts).toBeDefined();
-      expect(bodyParts).toContain(WORK); // Check body parts
+      expect(bodyParts).toContain(WORK);
       expect(bodyParts).toContain(CARRY);
       expect(bodyParts).toContain(MOVE);
 
-      expect(name).toMatch(/^Miner_\d+$/); // Check name format
-      expect(options.memory.role).toBe('miner'); // Check memory configuration
+      expect(name).toMatch(/^Miner_\d+$/);
+      expect(options.memory.role).toBe('miner');
     });
   });
 });

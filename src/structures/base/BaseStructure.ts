@@ -11,10 +11,8 @@ export abstract class BaseStructure implements IStructure {
     this.room = structure.room;
   }
 
-  // 每個建築物都需要實現的主要運行邏輯
   public abstract run(): void;
 
-  // Getter 方法
   public getId(): Id<Structure> {
     return this.id;
   }
@@ -27,9 +25,8 @@ export abstract class BaseStructure implements IStructure {
     return this.room;
   }
 
-  // 共用的工具方法
   protected isActive(): boolean {
-    return true; // 基本實現，子類可以覆寫
+    return true;
   }
 
   protected getStructure<T extends Structure>(): T | null {

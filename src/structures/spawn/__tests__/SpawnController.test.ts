@@ -1,6 +1,5 @@
 import { SpawnController } from '@/structures/spawn/SpawnController';
 
-// Mock the Spawn class
 const mockSpawnMiner = jest.fn();
 const mockHasEnoughEnergy = jest.fn().mockReturnValue(true);
 
