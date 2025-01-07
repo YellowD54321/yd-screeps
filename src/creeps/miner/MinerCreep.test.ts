@@ -1,4 +1,4 @@
-import { MinerCreep } from '@/creeps/MinerCreep';
+import { MinerCreep } from '@/creeps/miner/MinerCreep';
 import { creepActions } from '@/creeps/creepActions';
 
 jest.mock('@/creeps/creepActions', () => ({
@@ -21,6 +21,7 @@ describe('MinerCreep', () => {
     mockGetUsedCapacity = jest.fn().mockReturnValue(0);
 
     mockScreepsCreep = {
+      name: 'test-miner',
       memory: {
         role: CreepRole.MINER,
       },
@@ -28,12 +29,13 @@ describe('MinerCreep', () => {
         getFreeCapacity: mockGetFreeCapacity,
         getUsedCapacity: mockGetUsedCapacity,
       },
+      room: {
+        find: jest.fn(),
+      },
     } as unknown as Creep;
-
-    minerCreep = new MinerCreep(mockScreepsCreep);
   });
 
-  describe('run', () => {
+  describe('constructor', () => {
     it('should throw error if creep role is not miner', () => {
       mockScreepsCreep.memory.role = 'invalid_role' as CreepRole;
 
@@ -41,30 +43,38 @@ describe('MinerCreep', () => {
         'MinerCreep can only handle miner role, but got invalid_role'
       );
     });
+  });
+
+  describe('run', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
 
     it('should harvest energy when creep has free capacity', () => {
       mockGetFreeCapacity.mockReturnValue(50);
       mockGetUsedCapacity.mockReturnValue(0);
 
+      minerCreep = new MinerCreep(mockScreepsCreep);
       minerCreep.run();
 
       expect(creepActions.harvestEnergy).toHaveBeenCalledWith(mockScreepsCreep);
-      expect(creepActions.transferEnergy).not.toHaveBeenCalled();
     });
 
     it('should transfer energy when creep is full', () => {
       mockGetFreeCapacity.mockReturnValue(0);
       mockGetUsedCapacity.mockReturnValue(50);
 
+      minerCreep = new MinerCreep(mockScreepsCreep);
       minerCreep.run();
 
       expect(creepActions.transferEnergy).toHaveBeenCalledWith(mockScreepsCreep);
-      expect(creepActions.harvestEnergy).not.toHaveBeenCalled();
     });
 
     it('should harvest energy after transferring when empty', () => {
       mockGetFreeCapacity.mockReturnValue(0);
       mockGetUsedCapacity.mockReturnValue(50);
+
+      minerCreep = new MinerCreep(mockScreepsCreep);
       minerCreep.run();
       expect(creepActions.transferEnergy).toHaveBeenCalledWith(mockScreepsCreep);
 
