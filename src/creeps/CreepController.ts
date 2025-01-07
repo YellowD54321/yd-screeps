@@ -1,4 +1,4 @@
-import { MinerCreep } from '@/creeps/MinerCreep';
+import { MinerCreep } from '@/creeps/miner/MinerCreep';
 import { log } from '@/utils/logger';
 
 type CreepRole = 'miner';

@@ -1,7 +1,7 @@
 import { CreepController } from '@/creeps/CreepController';
 import '@/test/mockGame';
 
-jest.mock('@/creeps/MinerCreep', () => {
+jest.mock('@/creeps/miner/MinerCreep', () => {
   return {
     MinerCreep: jest.fn().mockImplementation(() => ({
       run: jest.fn(),
@@ -30,7 +30,7 @@ describe('CreepController', () => {
       controller = new CreepController();
       controller.run();
 
-      const { MinerCreep } = require('@/creeps/MinerCreep');
+      const { MinerCreep } = require('@/creeps/miner/MinerCreep');
       expect(MinerCreep).toHaveBeenCalledWith(mockMinerCreep);
       expect(MinerCreep.mock.results[0].value.run).toHaveBeenCalled();
     });
@@ -47,7 +47,7 @@ describe('CreepController', () => {
       controller = new CreepController();
       controller.run();
 
-      const { MinerCreep } = require('@/creeps/MinerCreep');
+      const { MinerCreep } = require('@/creeps/miner/MinerCreep');
       expect(MinerCreep).not.toHaveBeenCalled();
     });
 
@@ -71,7 +71,7 @@ describe('CreepController', () => {
       controller = new CreepController();
       controller.run();
 
-      const { MinerCreep } = require('@/creeps/MinerCreep');
+      const { MinerCreep } = require('@/creeps/miner/MinerCreep');
       expect(MinerCreep).toHaveBeenCalledTimes(2);
       expect(MinerCreep.mock.results[0].value.run).toHaveBeenCalled();
       expect(MinerCreep.mock.results[1].value.run).toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe('CreepController', () => {
         error1: mockErrorCreep,
       };
 
-      const { MinerCreep } = require('@/creeps/MinerCreep');
+      const { MinerCreep } = require('@/creeps/miner/MinerCreep');
       MinerCreep.mockImplementation(() => {
         throw new Error('Test error');
       });
