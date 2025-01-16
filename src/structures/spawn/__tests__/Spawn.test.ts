@@ -67,5 +67,20 @@ describe('Spawn', () => {
       expect(name).toMatch(/^Miner_\d+$/);
       expect(options.memory.role).toBe(CreepRole.MINER);
     });
+
+    it('should spawn an upgrader creep with correct configuration', () => {
+      spawn.spawnUpgrader();
+      expect(spawnCreep).toHaveBeenCalled();
+
+      const [bodyParts, name, options] = spawnCreep.mock.calls[0] || [];
+      expect(bodyParts).toBeDefined();
+      expect(bodyParts).toContain(WORK);
+      expect(bodyParts).toContain(CARRY);
+      expect(bodyParts).toContain(MOVE);
+
+      expect(name).toMatch(/^Upgrader_\d+$/);
+      expect(options.memory.role).toBe(CreepRole.UPGRADER);
+      expect(options.memory.state).toBe(CreepState.HARVESTING);
+    });
   });
 });

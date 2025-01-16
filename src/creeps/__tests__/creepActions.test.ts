@@ -5,6 +5,7 @@ describe('creepActions', () => {
   const moveTo = jest.fn();
   const harvest = jest.fn();
   const transfer = jest.fn();
+  const upgradeController = jest.fn();
 
   const find = jest.fn();
 
@@ -12,7 +13,11 @@ describe('creepActions', () => {
     moveTo,
     harvest,
     transfer,
-    room: { find },
+    upgradeController,
+    room: {
+      find,
+      controller: undefined,
+    },
     store: {
       getUsedCapacity: jest.fn(),
       getFreeCapacity: jest.fn(),
@@ -21,6 +26,7 @@ describe('creepActions', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCreep.room.controller = undefined;
   });
 
   describe('harvestEnergy', () => {
@@ -91,6 +97,39 @@ describe('creepActions', () => {
 
       expect(find).toHaveBeenCalledWith(FIND_MY_SPAWNS);
       expect(transfer).not.toHaveBeenCalled();
+      expect(moveTo).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('upgradeController', () => {
+    it('should move to controller if not in range', () => {
+      const mockController = { id: 'controller1' } as StructureController;
+      mockCreep.room.controller = mockController;
+      upgradeController.mockReturnValue(mockGame.ERR_NOT_IN_RANGE);
+
+      creepActions.upgradeController(mockCreep);
+
+      expect(upgradeController).toHaveBeenCalledWith(mockController);
+      expect(moveTo).toHaveBeenCalledWith(mockController);
+    });
+
+    it('should upgrade if in range', () => {
+      const mockController = { id: 'controller1' } as StructureController;
+      mockCreep.room.controller = mockController;
+      upgradeController.mockReturnValue(mockGame.OK);
+
+      creepActions.upgradeController(mockCreep);
+
+      expect(upgradeController).toHaveBeenCalledWith(mockController);
+      expect(moveTo).not.toHaveBeenCalled();
+    });
+
+    it('should do nothing if no controller found', () => {
+      mockCreep.room.controller = undefined;
+
+      creepActions.upgradeController(mockCreep);
+
+      expect(upgradeController).not.toHaveBeenCalled();
       expect(moveTo).not.toHaveBeenCalled();
     });
   });
