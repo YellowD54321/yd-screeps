@@ -6,6 +6,8 @@ describe('creepActions', () => {
   const harvest = jest.fn();
   const transfer = jest.fn();
   const upgradeController = jest.fn();
+  const build = jest.fn();
+  const repair = jest.fn();
 
   const find = jest.fn();
 
@@ -14,6 +16,8 @@ describe('creepActions', () => {
     harvest,
     transfer,
     upgradeController,
+    build,
+    repair,
     room: {
       find,
       controller: undefined,
@@ -131,6 +135,50 @@ describe('creepActions', () => {
 
       expect(upgradeController).not.toHaveBeenCalled();
       expect(moveTo).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('build', () => {
+    it('should build if in range', () => {
+      const mockSite = { id: 'site1' } as ConstructionSite;
+      build.mockReturnValue(mockGame.OK);
+
+      creepActions.build(mockCreep, mockSite);
+
+      expect(build).toHaveBeenCalledWith(mockSite);
+      expect(moveTo).not.toHaveBeenCalled();
+    });
+
+    it('should move to target if not in range', () => {
+      const mockSite = { id: 'site1' } as ConstructionSite;
+      build.mockReturnValue(mockGame.ERR_NOT_IN_RANGE);
+
+      creepActions.build(mockCreep, mockSite);
+
+      expect(build).toHaveBeenCalledWith(mockSite);
+      expect(moveTo).toHaveBeenCalledWith(mockSite);
+    });
+  });
+
+  describe('repair', () => {
+    it('should repair if in range', () => {
+      const mockStructure = { id: 'struct1' } as Structure;
+      repair.mockReturnValue(mockGame.OK);
+
+      creepActions.repair(mockCreep, mockStructure);
+
+      expect(repair).toHaveBeenCalledWith(mockStructure);
+      expect(moveTo).not.toHaveBeenCalled();
+    });
+
+    it('should move to target if not in range', () => {
+      const mockStructure = { id: 'struct1' } as Structure;
+      repair.mockReturnValue(mockGame.ERR_NOT_IN_RANGE);
+
+      creepActions.repair(mockCreep, mockStructure);
+
+      expect(repair).toHaveBeenCalledWith(mockStructure);
+      expect(moveTo).toHaveBeenCalledWith(mockStructure);
     });
   });
 });

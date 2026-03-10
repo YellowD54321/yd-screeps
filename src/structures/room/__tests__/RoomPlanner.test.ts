@@ -1,5 +1,6 @@
 import { TERRAIN_MASK_WALL } from '@/constants';
-import { planExtensions } from '@/structures/room/RoomPlanner';
+import { mockGame } from '@/test/mockGame';
+import { ensureExtensionConstructionSites, planExtensions } from '@/structures/room/RoomPlanner';
 
 function chebyshevDistance(a: { x: number; y: number }, b: { x: number; y: number }): number {
   return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
@@ -73,5 +74,112 @@ describe('planExtensions', () => {
         expect(pos.y).toBeLessThanOrEqual(49);
       }
     });
+  });
+});
+
+describe('ensureExtensionConstructionSites', () => {
+  const roomName = 'W1N1';
+  const spawnX = 25;
+  const spawnY = 30;
+  const mockGetTerrain = jest.fn();
+  const mockFind = jest.fn();
+  const mockCreateConstructionSite = jest.fn();
+
+  const mockSpawn = {
+    pos: { x: spawnX, y: spawnY, roomName },
+  } as unknown as StructureSpawn;
+
+  const occupiedPositions = new Map<string, { structures: number; constructionSites: number }>();
+
+  let mockRoom: Room;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetTerrain.mockImplementation(() => 0);
+    occupiedPositions.clear();
+    mockCreateConstructionSite.mockReturnValue(mockGame.OK);
+
+    (global as { __lookForGetter?: (x: number, y: number, type: string) => unknown[] }).__lookForGetter =
+      (x, y, type) => {
+        const key = `${x},${y}`;
+        const occ = occupiedPositions.get(key) || { structures: 0, constructionSites: 0 };
+        if (type === LOOK_STRUCTURES) return Array(occ.structures).fill({});
+        if (type === LOOK_CONSTRUCTION_SITES) return Array(occ.constructionSites).fill({});
+        return [];
+      };
+
+    mockRoom = {
+      name: roomName,
+      getTerrain: jest.fn().mockReturnValue({ get: mockGetTerrain }),
+      find: mockFind,
+      createConstructionSite: mockCreateConstructionSite,
+      controller: { level: 2 } as StructureController,
+    } as unknown as Room;
+  });
+
+  it('should not call createConstructionSite when RCL < 2', () => {
+    mockRoom.controller = { level: 1 } as StructureController;
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      if (type === FIND_MY_STRUCTURES) return [];
+      if (type === FIND_CONSTRUCTION_SITES) return [];
+      return [];
+    });
+
+    ensureExtensionConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).not.toHaveBeenCalled();
+  });
+
+  it('should not call createConstructionSite when Extension count >= 5', () => {
+    const fiveExtensions = Array(5).fill({ structureType: STRUCTURE_EXTENSION });
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      if (type === FIND_MY_STRUCTURES) return fiveExtensions;
+      if (type === FIND_CONSTRUCTION_SITES) return [];
+      return [];
+    });
+
+    ensureExtensionConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).not.toHaveBeenCalled();
+  });
+
+  it('should call createConstructionSite for empty positions when RCL >= 2 and count < 5', () => {
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      if (type === FIND_MY_STRUCTURES) return [];
+      if (type === FIND_CONSTRUCTION_SITES) return [];
+      return [];
+    });
+
+    ensureExtensionConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).toHaveBeenCalled();
+    const calls = mockCreateConstructionSite.mock.calls;
+    expect(calls.every(([x, y, type]) => type === STRUCTURE_EXTENSION)).toBe(true);
+    expect(calls.length).toBeLessThanOrEqual(5);
+  });
+
+  it('should skip positions that already have Structure or ConstructionSite', () => {
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      if (type === FIND_MY_STRUCTURES) return [];
+      if (type === FIND_CONSTRUCTION_SITES) return [];
+      return [];
+    });
+
+    const planned = planExtensions(mockRoom, mockSpawn);
+    if (planned.length > 0) {
+      const first = planned[0];
+      occupiedPositions.set(`${first.x},${first.y}`, { structures: 1, constructionSites: 0 });
+    }
+
+    ensureExtensionConstructionSites(mockRoom);
+
+    const calls = mockCreateConstructionSite.mock.calls;
+    const firstPos = planned[0];
+    const calledAtFirst = calls.some(([x, y]) => x === firstPos.x && y === firstPos.y);
+    expect(calledAtFirst).toBe(false);
   });
 });
