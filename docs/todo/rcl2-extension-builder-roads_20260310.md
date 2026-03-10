@@ -17,8 +17,8 @@
 
 ## TODO List（勾選追蹤）
 
-- [ ] #1 RoomPlanner 骨架與 planExtensions
-- [ ] #2 Extension ConstructionSite 建立流程
+- [x] #1 RoomPlanner 骨架與 planExtensions
+- [x] #2 Extension ConstructionSite 建立流程
 - [ ] #3 Builder 骨架與 Memory
 - [ ] #4 creepActions 擴充 build/repair
 - [ ] #5 Builder harvesting 行為

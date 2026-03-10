@@ -55,3 +55,34 @@ export function planExtensions(room: Room, spawn: StructureSpawn): { x: number; 
 
   return selectExtensionPositions(candidates, 5);
 }
+
+/**
+ * Ensures 5 Extension construction sites exist when RCL >= 2.
+ * Skips if already 5 Extensions (Structure + ConstructionSite).
+ */
+export function ensureExtensionConstructionSites(room: Room): void {
+  if (!room.controller || room.controller.level < 2) return;
+  const spawn = room.find(FIND_MY_SPAWNS)[0];
+  if (!spawn) return;
+
+  let existing =
+    room.find(FIND_MY_STRUCTURES, {
+      filter: { structureType: STRUCTURE_EXTENSION },
+    }).length +
+    room.find(FIND_CONSTRUCTION_SITES, {
+      filter: { structureType: STRUCTURE_EXTENSION },
+    }).length;
+  if (existing >= 5) return;
+
+  const planned = planExtensions(room, spawn);
+  for (const { x, y } of planned) {
+    if (existing >= 5) break;
+    const pos = new RoomPosition(x, y, room.name);
+    const hasStructure = pos.lookFor(LOOK_STRUCTURES).length > 0;
+    const hasConstructionSite = pos.lookFor(LOOK_CONSTRUCTION_SITES).length > 0;
+    if (!hasStructure && !hasConstructionSite) {
+      const result = room.createConstructionSite(x, y, STRUCTURE_EXTENSION);
+      if (result === OK) existing++;
+    }
+  }
+}
