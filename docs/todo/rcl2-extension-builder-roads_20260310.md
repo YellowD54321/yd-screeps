@@ -19,10 +19,10 @@
 
 - [x] #1 RoomPlanner 骨架與 planExtensions
 - [x] #2 Extension ConstructionSite 建立流程
-- [ ] #3 Builder 骨架與 Memory
-- [ ] #4 creepActions 擴充 build/repair
-- [ ] #5 Builder harvesting 行為
-- [ ] #6 Builder building 行為與 getNextBuildTarget
+- [x] #3 Builder 骨架與 Memory
+- [x] #4 creepActions 擴充 build/repair
+- [x] #5 Builder harvesting 行為
+- [x] #6 Builder building 行為與 getNextBuildTarget
 - [ ] #7 道路建造 createRoadConstructionSites
 - [ ] #8 道路建造觸發與整合
 - [ ] #9 SpawnController 與 CreepController 整合

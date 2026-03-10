@@ -6,6 +6,7 @@ const FIND_CONSTRUCTION_SITES = 111 as FindConstant;
 const LOOK_STRUCTURES = 'structure' as LookConstant;
 const LOOK_CONSTRUCTION_SITES = 'constructionSite' as LookConstant;
 const STRUCTURE_EXTENSION = 'extension' as StructureConstant;
+const STRUCTURE_ROAD = 'road' as StructureConstant;
 const WORK = 'work' as BodyPartConstant;
 const CARRY = 'carry' as BodyPartConstant;
 const MOVE = 'move' as BodyPartConstant;
@@ -20,6 +21,7 @@ export const mockGame = {
   LOOK_STRUCTURES,
   LOOK_CONSTRUCTION_SITES,
   STRUCTURE_EXTENSION,
+  STRUCTURE_ROAD,
   WORK,
   CARRY,
   MOVE,

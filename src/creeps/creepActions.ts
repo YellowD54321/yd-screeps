@@ -25,4 +25,16 @@ export const creepActions = {
       }
     }
   },
+
+  build: (creep: Creep, target: ConstructionSite) => {
+    if (creep.build(target) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(target);
+    }
+  },
+
+  repair: (creep: Creep, target: Structure) => {
+    if (creep.repair(target) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(target);
+    }
+  },
 };
