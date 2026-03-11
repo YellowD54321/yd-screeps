@@ -30,6 +30,10 @@ interface BuilderMemory extends CreepMemory {
   buildingTargetId?: Id<ConstructionSite>;
 }
 
+interface RoomMemory {
+  frequentPaths?: Record<string, boolean>;
+}
+
 interface Memory {
   creeps: { [name: string]: CreepMemory | MinerMemory | UpgraderMemory | BuilderMemory };
   spawns: { [name: string]: SpawnMemory };

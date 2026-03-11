@@ -86,3 +86,35 @@ export function ensureExtensionConstructionSites(room: Room): void {
     }
   }
 }
+
+/**
+ * Creates road construction sites from frequentPaths in room memory.
+ * Skips positions that cannot have a building (already have Structure or ConstructionSite).
+ */
+export function createRoadConstructionSites(room: Room): void {
+  const paths = room.memory.frequentPaths;
+  if (!paths || Object.keys(paths).length === 0) return;
+
+  for (const key of Object.keys(paths)) {
+    const [x, y] = key.split(',').map(Number);
+    const pos = new RoomPosition(x, y, room.name);
+    const hasStructure = pos.lookFor(LOOK_STRUCTURES).length > 0;
+    const hasConstructionSite = pos.lookFor(LOOK_CONSTRUCTION_SITES).length > 0;
+    if (hasStructure || hasConstructionSite) continue;
+
+    room.createConstructionSite(x, y, STRUCTURE_ROAD);
+  }
+}
+
+/**
+ * Ensures road construction sites exist when Extension count >= 5.
+ * Calls createRoadConstructionSites when condition is met.
+ */
+export function ensureRoadConstructionSites(room: Room): void {
+  const extensionCount = room.find(FIND_MY_STRUCTURES, {
+    filter: { structureType: STRUCTURE_EXTENSION },
+  }).length;
+  if (extensionCount < 5) return;
+
+  createRoadConstructionSites(room);
+}

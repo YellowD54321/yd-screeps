@@ -1,6 +1,11 @@
 import { TERRAIN_MASK_WALL } from '@/constants';
 import { mockGame } from '@/test/mockGame';
-import { ensureExtensionConstructionSites, planExtensions } from '@/structures/room/RoomPlanner';
+import {
+  createRoadConstructionSites,
+  ensureExtensionConstructionSites,
+  ensureRoadConstructionSites,
+  planExtensions,
+} from '@/structures/room/RoomPlanner';
 
 function chebyshevDistance(a: { x: number; y: number }, b: { x: number; y: number }): number {
   return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
@@ -181,5 +186,153 @@ describe('ensureExtensionConstructionSites', () => {
     const firstPos = planned[0];
     const calledAtFirst = calls.some(([x, y]) => x === firstPos.x && y === firstPos.y);
     expect(calledAtFirst).toBe(false);
+  });
+});
+
+describe('createRoadConstructionSites', () => {
+  const roomName = 'W1N1';
+  const spawnX = 25;
+  const spawnY = 30;
+  const mockFind = jest.fn();
+  const mockCreateConstructionSite = jest.fn();
+  const occupiedPositions = new Map<string, { structures: number; constructionSites: number }>();
+
+  const mockSpawn = {
+    pos: { x: spawnX, y: spawnY, roomName },
+  } as unknown as StructureSpawn;
+
+  let mockRoom: Room;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    occupiedPositions.clear();
+    mockCreateConstructionSite.mockReturnValue(mockGame.OK);
+
+    (global as { __lookForGetter?: (x: number, y: number, type: string) => unknown[] }).__lookForGetter =
+      (x, y, type) => {
+        const key = `${x},${y}`;
+        const occ = occupiedPositions.get(key) || { structures: 0, constructionSites: 0 };
+        if (type === LOOK_STRUCTURES) return Array(occ.structures).fill({});
+        if (type === LOOK_CONSTRUCTION_SITES) return Array(occ.constructionSites).fill({});
+        return [];
+      };
+
+    mockRoom = {
+      name: roomName,
+      memory: {},
+      find: mockFind,
+      createConstructionSite: mockCreateConstructionSite,
+    } as unknown as Room;
+
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      return [];
+    });
+  });
+
+  it('should not call createConstructionSite when frequentPaths is undefined', () => {
+    mockRoom.memory = {} as RoomMemory;
+
+    createRoadConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).not.toHaveBeenCalled();
+  });
+
+  it('should not call createConstructionSite when frequentPaths is empty', () => {
+    mockRoom.memory = { frequentPaths: {} } as RoomMemory;
+
+    createRoadConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).not.toHaveBeenCalled();
+  });
+
+  it('should create road construction sites from frequentPaths', () => {
+    mockRoom.memory = {
+      frequentPaths: { '26,30': true, '27,30': true },
+    } as RoomMemory;
+
+    createRoadConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).toHaveBeenCalledWith(26, 30, STRUCTURE_ROAD);
+    expect(mockCreateConstructionSite).toHaveBeenCalledWith(27, 30, STRUCTURE_ROAD);
+    expect(mockCreateConstructionSite).toHaveBeenCalledTimes(2);
+  });
+
+  it('should skip positions that already have Structure or ConstructionSite', () => {
+    mockRoom.memory = {
+      frequentPaths: { '26,30': true, '27,30': true },
+    } as RoomMemory;
+    occupiedPositions.set('26,30', { structures: 1, constructionSites: 0 });
+
+    createRoadConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).toHaveBeenCalledTimes(1);
+    expect(mockCreateConstructionSite).toHaveBeenCalledWith(27, 30, STRUCTURE_ROAD);
+  });
+
+  it('should skip positions that cannot have a building (e.g. occupied by Spawn)', () => {
+    mockRoom.memory = {
+      frequentPaths: { '25,30': true, '26,30': true },
+    } as RoomMemory;
+    occupiedPositions.set('25,30', { structures: 1, constructionSites: 0 });
+
+    createRoadConstructionSites(mockRoom);
+
+    const spawnCall = mockCreateConstructionSite.mock.calls.find(
+      ([x, y]) => x === spawnX && y === spawnY
+    );
+    expect(spawnCall).toBeUndefined();
+    expect(mockCreateConstructionSite).toHaveBeenCalledWith(26, 30, STRUCTURE_ROAD);
+  });
+});
+
+describe('ensureRoadConstructionSites', () => {
+  const roomName = 'W1N1';
+  const mockFind = jest.fn();
+  const mockCreateConstructionSite = jest.fn();
+
+  const mockSpawn = {
+    pos: { x: 25, y: 30, roomName },
+  } as unknown as StructureSpawn;
+
+  let mockRoom: Room;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCreateConstructionSite.mockReturnValue(mockGame.OK);
+
+    (global as { __lookForGetter?: (x: number, y: number, type: string) => unknown[] }).__lookForGetter =
+      () => [];
+
+    mockRoom = {
+      name: roomName,
+      memory: { frequentPaths: { '26,30': true } } as RoomMemory,
+      find: mockFind,
+      createConstructionSite: mockCreateConstructionSite,
+    } as unknown as Room;
+  });
+
+  it('should not call createRoadConstructionSites when Extension count < 5', () => {
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      if (type === FIND_MY_STRUCTURES) return Array(3).fill({ structureType: STRUCTURE_EXTENSION });
+      return [];
+    });
+
+    ensureRoadConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).not.toHaveBeenCalled();
+  });
+
+  it('should call createConstructionSite for roads when Extension count >= 5', () => {
+    mockFind.mockImplementation((type: FindConstant) => {
+      if (type === FIND_MY_SPAWNS) return [mockSpawn];
+      if (type === FIND_MY_STRUCTURES) return Array(5).fill({ structureType: STRUCTURE_EXTENSION });
+      return [];
+    });
+
+    ensureRoadConstructionSites(mockRoom);
+
+    expect(mockCreateConstructionSite).toHaveBeenCalledWith(26, 30, STRUCTURE_ROAD);
   });
 });
