@@ -23,8 +23,8 @@
 - [x] #4 creepActions 擴充 build/repair
 - [x] #5 Builder harvesting 行為
 - [x] #6 Builder building 行為與 getNextBuildTarget
-- [ ] #7 道路建造 createRoadConstructionSites
-- [ ] #8 道路建造觸發與整合
+- [x] #7 道路建造 createRoadConstructionSites
+- [x] #8 道路建造觸發與整合
 - [ ] #9 SpawnController 與 CreepController 整合
 
 ---
@@ -83,12 +83,13 @@
 ### #7 道路建造 createRoadConstructionSites
 
 - `RoomPlanner.ts`：`createRoadConstructionSites(room)`
-- 遍歷 `room.memory.frequentPaths`，排除已有建築座標，建立 `STRUCTURE_ROAD` ConstructionSite
+- 遍歷 `room.memory.frequentPaths`，排除已有建築座標（依該座標能否放下建築物判定：Structure 或 ConstructionSite 存在則跳過），建立 `STRUCTURE_ROAD` ConstructionSite
 - 單元測試：依 frequentPaths 建立、排除已有建築
 
 ### #8 道路建造觸發與整合
 
-- 檢查 Extension 數量 >= 5 後呼叫 `createRoadConstructionSites`
+- `RoomPlanner.ts`：`ensureRoadConstructionSites(room)`，Extension 數量 >= 5 時呼叫 `createRoadConstructionSites`
+- `gameRunner.ts`：於 `ensureExtensionConstructionSites` 後呼叫 `ensureRoadConstructionSites`
 - Builder 的 getNextBuildTarget 已支援道路，無需額外修改
 
 ### #9 SpawnController 與 CreepController 整合
