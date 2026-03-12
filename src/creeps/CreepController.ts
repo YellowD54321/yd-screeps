@@ -1,6 +1,7 @@
 import { BuilderCreep } from '@/creeps/builder/BuilderCreep';
 import { MinerCreep } from '@/creeps/miner/MinerCreep';
 import { UpgraderCreep } from '@/creeps/upgrader/UpgraderCreep';
+import { recordFrequentPath } from '@/utils/pathRecord';
 import { log } from '@/utils/logger';
 
 type CreepRole = 'miner' | 'upgrader' | 'builder';
@@ -17,6 +18,7 @@ export class CreepController {
     for (const name in this.creeps) {
       try {
         const creep = this.creeps[name];
+        recordFrequentPath(creep);
         const role = creep.memory.role;
 
         if (!this.isValidRole(role)) {
