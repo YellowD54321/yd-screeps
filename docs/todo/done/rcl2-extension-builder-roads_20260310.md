@@ -25,7 +25,7 @@
 - [x] #6 Builder building 行為與 getNextBuildTarget
 - [x] #7 道路建造 createRoadConstructionSites
 - [x] #8 道路建造觸發與整合
-- [ ] #9 SpawnController 與 CreepController 整合
+- [x] #9 SpawnController 與 CreepController 整合
 
 ---
 
@@ -92,9 +92,9 @@
 - `gameRunner.ts`：於 `ensureExtensionConstructionSites` 後呼叫 `ensureRoadConstructionSites`
 - Builder 的 getNextBuildTarget 已支援道路，無需額外修改
 
-### #9 SpawnController 與 CreepController 整合
+### #9 SpawnController 與 CreepController 整合（已完成）
 
-- SpawnController：Builder 生產條件（Extension 存在或 Extension ConstructionSite 存在）
+- SpawnController：RCL 驅動配置（`spawnConfig.ts`）、Builder 生產條件（Extension 或 Extension ConstructionSite 存在）、`getSpawnConfig()`、`shouldSpawnBuilder()`
 - Spawn.ts：`spawnBuilder`
 - CreepController：分派 `builder` 角色至 BuilderCreep
 
@@ -128,3 +128,4 @@
 | Extension 完成後建立道路 ConstructionSite | #8 |
 | Builder 在常走路徑上蓋道路 | #6, #8 |
 | Builder store 空時採集 Source | #5 |
+| Builder 生產條件、CreepController 分派 builder | #9 |

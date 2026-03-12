@@ -17,6 +17,14 @@ jest.mock('@/creeps/upgrader/UpgraderCreep', () => {
   };
 });
 
+jest.mock('@/creeps/builder/BuilderCreep', () => {
+  return {
+    BuilderCreep: jest.fn().mockImplementation(() => ({
+      run: jest.fn(),
+    })),
+  };
+});
+
 describe('CreepController', () => {
   let controller: CreepController;
 
@@ -60,6 +68,23 @@ describe('CreepController', () => {
       expect(UpgraderCreep.mock.results[0].value.run).toHaveBeenCalled();
     });
 
+    it('should process builder creeps', () => {
+      const mockBuilderCreep = {
+        memory: { role: CreepRole.BUILDER },
+      } as unknown as Creep;
+
+      Game.creeps = {
+        builder1: mockBuilderCreep,
+      };
+
+      controller = new CreepController();
+      controller.run();
+
+      const { BuilderCreep } = require('@/creeps/builder/BuilderCreep');
+      expect(BuilderCreep).toHaveBeenCalledWith(mockBuilderCreep);
+      expect(BuilderCreep.mock.results[0].value.run).toHaveBeenCalled();
+    });
+
     it('should handle invalid role gracefully', () => {
       const mockInvalidCreep = {
         memory: { role: 'invalid_role' },
@@ -74,8 +99,10 @@ describe('CreepController', () => {
 
       const { MinerCreep } = require('@/creeps/miner/MinerCreep');
       const { UpgraderCreep } = require('@/creeps/upgrader/UpgraderCreep');
+      const { BuilderCreep } = require('@/creeps/builder/BuilderCreep');
       expect(MinerCreep).not.toHaveBeenCalled();
       expect(UpgraderCreep).not.toHaveBeenCalled();
+      expect(BuilderCreep).not.toHaveBeenCalled();
     });
 
     it('should handle multiple creeps', () => {
@@ -85,6 +112,9 @@ describe('CreepController', () => {
       const mockUpgraderCreep = {
         memory: { role: CreepRole.UPGRADER },
       } as unknown as Creep;
+      const mockBuilderCreep = {
+        memory: { role: CreepRole.BUILDER },
+      } as unknown as Creep;
       const mockInvalidCreep = {
         memory: { role: 'invalid_role' },
       } as unknown as Creep;
@@ -92,6 +122,7 @@ describe('CreepController', () => {
       Game.creeps = {
         miner1: mockMinerCreep,
         upgrader1: mockUpgraderCreep,
+        builder1: mockBuilderCreep,
         invalid: mockInvalidCreep,
       };
 
@@ -100,10 +131,13 @@ describe('CreepController', () => {
 
       const { MinerCreep } = require('@/creeps/miner/MinerCreep');
       const { UpgraderCreep } = require('@/creeps/upgrader/UpgraderCreep');
+      const { BuilderCreep } = require('@/creeps/builder/BuilderCreep');
       expect(MinerCreep).toHaveBeenCalledTimes(1);
       expect(UpgraderCreep).toHaveBeenCalledTimes(1);
+      expect(BuilderCreep).toHaveBeenCalledTimes(1);
       expect(MinerCreep.mock.results[0].value.run).toHaveBeenCalled();
       expect(UpgraderCreep.mock.results[0].value.run).toHaveBeenCalled();
+      expect(BuilderCreep.mock.results[0].value.run).toHaveBeenCalled();
     });
 
     it('should handle errors gracefully', () => {
