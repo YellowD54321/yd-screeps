@@ -4,6 +4,7 @@ export class Spawn extends BaseStructure {
   private spawn: StructureSpawn;
   private readonly MINER_BODY = [WORK, CARRY, MOVE];
   private readonly UPGRADER_BODY = [WORK, CARRY, MOVE];
+  private readonly BUILDER_BODY = [WORK, CARRY, MOVE];
   private readonly MINIMUM_ENERGY = 200; // Energy cost: WORK(100) + CARRY(50) + MOVE(50)
 
   constructor(spawn: StructureSpawn) {
@@ -32,6 +33,15 @@ export class Spawn extends BaseStructure {
     return this.spawn.spawnCreep(this.UPGRADER_BODY, `Upgrader_${Game.time}`, {
       memory: {
         role: CreepRole.UPGRADER,
+        state: CreepState.HARVESTING,
+      },
+    });
+  }
+
+  public spawnBuilder(): ScreepsReturnCode {
+    return this.spawn.spawnCreep(this.BUILDER_BODY, `Builder_${Game.time}`, {
+      memory: {
+        role: CreepRole.BUILDER,
         state: CreepState.HARVESTING,
       },
     });
