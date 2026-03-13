@@ -3,6 +3,7 @@ import { BaseStructure } from '@/structures/base/BaseStructure';
 export class Spawn extends BaseStructure {
   private spawn: StructureSpawn;
   private readonly MINER_BODY = [WORK, CARRY, MOVE];
+  private readonly SOURCE_MINER_BODY = [WORK, WORK, WORK, MOVE];
   private readonly UPGRADER_BODY = [WORK, CARRY, MOVE];
   private readonly BUILDER_BODY = [WORK, CARRY, MOVE];
   private readonly MINIMUM_ENERGY = 200; // Energy cost: WORK(100) + CARRY(50) + MOVE(50)
@@ -24,6 +25,15 @@ export class Spawn extends BaseStructure {
     return this.spawn.spawnCreep(this.MINER_BODY, `Miner_${Game.time}`, {
       memory: {
         role: CreepRole.MINER,
+        state: CreepState.HARVESTING,
+      },
+    });
+  }
+
+  public spawnSourceMiner(): ScreepsReturnCode {
+    return this.spawn.spawnCreep(this.SOURCE_MINER_BODY, `SourceMiner_${Game.time}`, {
+      memory: {
+        role: CreepRole.SOURCE_MINER,
         state: CreepState.HARVESTING,
       },
     });
