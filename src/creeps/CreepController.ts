@@ -1,14 +1,20 @@
 import { BuilderCreep } from '@/creeps/builder/BuilderCreep';
 import { MinerCreep } from '@/creeps/miner/MinerCreep';
+import { SourceMinerCreep } from '@/creeps/sourceMiner/SourceMinerCreep';
 import { UpgraderCreep } from '@/creeps/upgrader/UpgraderCreep';
 import { recordFrequentPath } from '@/utils/pathRecord';
 import { log } from '@/utils/logger';
 
-type CreepRole = 'miner' | 'upgrader' | 'builder';
+type CreepRole = 'miner' | 'sourceMiner' | 'upgrader' | 'builder';
 
 export class CreepController {
   private creeps: { [name: string]: Creep };
-  private readonly VALID_ROLES: readonly CreepRole[] = ['miner', 'upgrader', 'builder'];
+  private readonly VALID_ROLES: readonly CreepRole[] = [
+    'miner',
+    'sourceMiner',
+    'upgrader',
+    'builder',
+  ];
 
   constructor() {
     this.creeps = Game.creeps;
@@ -42,6 +48,11 @@ export class CreepController {
       case 'miner': {
         const minerCreep = new MinerCreep(creep);
         minerCreep.run();
+        break;
+      }
+      case 'sourceMiner': {
+        const sourceMinerCreep = new SourceMinerCreep(creep);
+        sourceMinerCreep.run();
         break;
       }
       case 'upgrader': {

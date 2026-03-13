@@ -82,5 +82,18 @@ describe('Spawn', () => {
       expect(options.memory.role).toBe(CreepRole.UPGRADER);
       expect(options.memory.state).toBe(CreepState.HARVESTING);
     });
+
+    it('should spawn a sourceMiner creep with correct configuration', () => {
+      spawn.spawnSourceMiner();
+      expect(spawnCreep).toHaveBeenCalled();
+
+      const [bodyParts, name, options] = spawnCreep.mock.calls[0] || [];
+      expect(bodyParts).toBeDefined();
+      expect(bodyParts).toEqual([WORK, WORK, WORK, MOVE]);
+
+      expect(name).toMatch(/^SourceMiner_\d+$/);
+      expect(options.memory.role).toBe(CreepRole.SOURCE_MINER);
+      expect(options.memory.state).toBe(CreepState.HARVESTING);
+    });
   });
 });

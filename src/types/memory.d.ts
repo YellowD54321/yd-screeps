@@ -8,6 +8,7 @@ declare const enum CreepState {
 
 declare const enum CreepRole {
   MINER = 'miner',
+  SOURCE_MINER = 'sourceMiner',
   UPGRADER = 'upgrader',
   BUILDER = 'builder',
 }
@@ -19,6 +20,10 @@ interface CreepMemory {
 
 interface MinerMemory extends CreepMemory {
   role: CreepRole.MINER;
+}
+
+interface SourceMinerMemory extends CreepMemory {
+  role: CreepRole.SOURCE_MINER;
 }
 
 interface UpgraderMemory extends CreepMemory {
@@ -35,7 +40,14 @@ interface RoomMemory {
 }
 
 interface Memory {
-  creeps: { [name: string]: CreepMemory | MinerMemory | UpgraderMemory | BuilderMemory };
+  creeps: {
+    [name: string]:
+      | CreepMemory
+      | MinerMemory
+      | SourceMinerMemory
+      | UpgraderMemory
+      | BuilderMemory;
+  };
   spawns: { [name: string]: SpawnMemory };
   rooms: { [name: string]: RoomMemory };
 }
