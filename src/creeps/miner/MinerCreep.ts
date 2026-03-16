@@ -1,9 +1,9 @@
-import { createActor } from 'xstate';
 import { createMinerMachine } from '@/creeps/miner/minerMachine';
+import { SimpleMachine } from '@/creeps/stateMachine';
 
 export class MinerCreep {
   private creep: Creep;
-  private actor: ReturnType<typeof createActor>;
+  private actor: SimpleMachine;
 
   constructor(creep: Creep) {
     this.creep = creep;
@@ -11,9 +11,7 @@ export class MinerCreep {
       throw new Error(`MinerCreep can only handle miner role, but got ${this.creep.memory.role}`);
     }
 
-    const machine = createMinerMachine(this.creep);
-    this.actor = createActor(machine, { systemId: `miner-${this.creep.name}` });
-    this.actor.start();
+    this.actor = createMinerMachine(this.creep);
   }
 
   public run(): void {

@@ -1,4 +1,3 @@
-import { createActor } from 'xstate';
 import { createBuilderMachine } from '@/creeps/builder/builderMachine';
 import { creepActions } from '@/creeps/creepActions';
 import { getNextBuildTarget } from '@/creeps/builder/getNextBuildTarget';
@@ -41,16 +40,12 @@ describe('builderMachine', () => {
 
   it('should start in harvesting state', () => {
     const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
 
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should call harvestEnergy on harvesting entry', () => {
-    const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
+    createBuilderMachine(mockCreep);
 
     expect(creepActions.harvestEnergy).toHaveBeenCalledWith(mockCreep);
   });
@@ -59,22 +54,18 @@ describe('builderMachine', () => {
     (mockCreep.store.getFreeCapacity as jest.Mock).mockReturnValue(0);
 
     const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
+    machine.send({ type: 'TRANSITION' });
 
-    expect(actor.getSnapshot().value).toBe('building');
+    expect(machine.getSnapshot().value).toBe('building');
   });
 
   it('should stay in harvesting when store is not full', () => {
     (mockCreep.store.getFreeCapacity as jest.Mock).mockReturnValue(50);
 
     const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
+    machine.send({ type: 'TRANSITION' });
 
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should transition to harvesting when store is empty in building state', () => {
@@ -82,16 +73,14 @@ describe('builderMachine', () => {
     (mockCreep.store.getUsedCapacity as jest.Mock).mockReturnValue(50);
 
     const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('building');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('building');
 
     (mockCreep.store.getFreeCapacity as jest.Mock).mockReturnValue(50);
     (mockCreep.store.getUsedCapacity as jest.Mock).mockReturnValue(0);
-    actor.send({ type: 'TRANSITION' });
+    machine.send({ type: 'TRANSITION' });
 
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should call harvestEnergy again when re-entering harvesting from building', () => {
@@ -99,18 +88,16 @@ describe('builderMachine', () => {
     (mockCreep.store.getUsedCapacity as jest.Mock).mockReturnValue(50);
 
     const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
     expect(creepActions.harvestEnergy).toHaveBeenCalledTimes(1);
 
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('building');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('building');
 
     (mockCreep.store.getFreeCapacity as jest.Mock).mockReturnValue(50);
     (mockCreep.store.getUsedCapacity as jest.Mock).mockReturnValue(0);
-    actor.send({ type: 'TRANSITION' });
+    machine.send({ type: 'TRANSITION' });
 
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    expect(machine.getSnapshot().value).toBe('harvesting');
     expect(creepActions.harvestEnergy).toHaveBeenCalledTimes(2);
   });
 
@@ -119,13 +106,11 @@ describe('builderMachine', () => {
     (mockCreep.store.getUsedCapacity as jest.Mock).mockReturnValue(50);
 
     const machine = createBuilderMachine(mockCreep);
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('building');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('building');
 
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('building');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('building');
   });
 
   describe('building entry action', () => {
@@ -136,11 +121,9 @@ describe('builderMachine', () => {
       (mockCreep.store.getUsedCapacity as jest.Mock).mockReturnValue(50);
 
       const machine = createBuilderMachine(mockCreep);
-      const actor = createActor(machine);
-      actor.start();
-      actor.send({ type: 'TRANSITION' });
-      expect(actor.getSnapshot().value).toBe('building');
-      return actor;
+      machine.send({ type: 'TRANSITION' });
+      expect(machine.getSnapshot().value).toBe('building');
+      return machine;
     }
 
     it('should find target via getNextBuildTarget when no target in memory', () => {

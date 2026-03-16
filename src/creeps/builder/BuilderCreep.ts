@@ -1,9 +1,9 @@
-import { createActor } from 'xstate';
 import { createBuilderMachine } from '@/creeps/builder/builderMachine';
+import { SimpleMachine } from '@/creeps/stateMachine';
 
 export class BuilderCreep {
   private creep: Creep;
-  private actor: ReturnType<typeof createActor>;
+  private actor: SimpleMachine;
 
   constructor(creep: Creep) {
     this.creep = creep;
@@ -11,9 +11,7 @@ export class BuilderCreep {
       throw new Error(`BuilderCreep can only handle builder role, but got ${this.creep.memory.role}`);
     }
 
-    const machine = createBuilderMachine(this.creep);
-    this.actor = createActor(machine, { systemId: `builder-${this.creep.name}` });
-    this.actor.start();
+    this.actor = createBuilderMachine(this.creep);
   }
 
   public run(): void {

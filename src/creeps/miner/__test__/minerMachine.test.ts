@@ -1,4 +1,3 @@
-import { createActor } from 'xstate';
 import { createMinerMachine } from '@/creeps/miner/minerMachine';
 
 jest.mock('@/creeps/creepActions', () => ({
@@ -24,11 +23,10 @@ describe('minerMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createMinerMachine(creep));
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('harvesting');
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('transferring');
+    const machine = createMinerMachine(creep);
+    expect(machine.getSnapshot().value).toBe('harvesting');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('transferring');
   });
 
   it('should transition from transferring to harvesting when empty', () => {
@@ -42,10 +40,9 @@ describe('minerMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createMinerMachine(creep));
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    const machine = createMinerMachine(creep);
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should stay in harvesting state when not full', () => {
@@ -59,10 +56,9 @@ describe('minerMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createMinerMachine(creep));
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    const machine = createMinerMachine(creep);
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should stay in transferring state when not empty', () => {
@@ -78,14 +74,13 @@ describe('minerMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createMinerMachine(creep));
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('transferring');
+    const machine = createMinerMachine(creep);
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('transferring');
 
     mockGetFreeCapacity.mockReturnValue(25);
     mockGetUsedCapacity.mockReturnValue(25);
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('transferring');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('transferring');
   });
 });
