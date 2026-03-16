@@ -1,4 +1,3 @@
-import { createActor } from 'xstate';
 import { createSourceMinerMachine } from '../sourceMinerMachine';
 
 jest.mock('@/creeps/creepActions', () => ({
@@ -19,11 +18,8 @@ describe('sourceMinerMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createSourceMinerMachine(creep), {
-      systemId: 'test-source-miner',
-    });
-    actor.start();
+    const machine = createSourceMinerMachine(creep);
 
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 });

@@ -1,9 +1,9 @@
-import { createActor } from 'xstate';
 import { createSourceMinerMachine } from '@/creeps/sourceMiner/sourceMinerMachine';
+import { SimpleMachine } from '@/creeps/stateMachine';
 
 export class SourceMinerCreep {
   private creep: Creep;
-  private actor: ReturnType<typeof createActor>;
+  private actor: SimpleMachine;
 
   constructor(creep: Creep) {
     this.creep = creep;
@@ -13,9 +13,7 @@ export class SourceMinerCreep {
       );
     }
 
-    const machine = createSourceMinerMachine(this.creep);
-    this.actor = createActor(machine, { systemId: `sourceMiner-${this.creep.name}` });
-    this.actor.start();
+    this.actor = createSourceMinerMachine(this.creep);
   }
 
   public run(): void {

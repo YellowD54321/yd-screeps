@@ -1,4 +1,3 @@
-import { createActor } from 'xstate';
 import { createUpgraderMachine } from '@/creeps/upgrader/upgraderMachine';
 
 jest.mock('@/creeps/creepActions', () => ({
@@ -24,11 +23,10 @@ describe('upgraderMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createUpgraderMachine(creep));
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('harvesting');
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('upgrading');
+    const machine = createUpgraderMachine(creep);
+    expect(machine.getSnapshot().value).toBe('harvesting');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('upgrading');
   });
 
   it('should transition from upgrading to harvesting when empty', () => {
@@ -42,10 +40,9 @@ describe('upgraderMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createUpgraderMachine(creep));
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    const machine = createUpgraderMachine(creep);
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should stay in harvesting state when not full', () => {
@@ -59,10 +56,9 @@ describe('upgraderMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createUpgraderMachine(creep));
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('harvesting');
+    const machine = createUpgraderMachine(creep);
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('harvesting');
   });
 
   it('should stay in upgrading state when not empty', () => {
@@ -78,14 +74,13 @@ describe('upgraderMachine', () => {
       },
     } as unknown as Creep;
 
-    const actor = createActor(createUpgraderMachine(creep));
-    actor.start();
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('upgrading');
+    const machine = createUpgraderMachine(creep);
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('upgrading');
 
     mockGetFreeCapacity.mockReturnValue(25);
     mockGetUsedCapacity.mockReturnValue(25);
-    actor.send({ type: 'TRANSITION' });
-    expect(actor.getSnapshot().value).toBe('upgrading');
+    machine.send({ type: 'TRANSITION' });
+    expect(machine.getSnapshot().value).toBe('upgrading');
   });
 });

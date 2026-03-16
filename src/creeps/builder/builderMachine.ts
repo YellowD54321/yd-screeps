@@ -1,14 +1,6 @@
-import { createMachine } from 'xstate';
+import { SimpleMachine } from '@/creeps/stateMachine';
 import { creepActions } from '@/creeps/creepActions';
 import { getNextBuildTarget } from '@/creeps/builder/getNextBuildTarget';
-
-interface BuilderContext {
-  creep: Creep;
-}
-
-type BuilderEvent = {
-  type: 'TRANSITION';
-};
 
 function resolveTarget(creep: Creep): ConstructionSite | null {
   const memory = creep.memory as BuilderMemory;
@@ -27,49 +19,32 @@ function resolveTarget(creep: Creep): ConstructionSite | null {
 }
 
 export const createBuilderMachine = (creep: Creep) =>
-  createMachine(
-    {
-      id: 'builder',
-      initial: 'harvesting',
-      context: { creep },
-      schemas: {
-        context: {} as BuilderContext,
-        events: {} as BuilderEvent,
-      },
-      states: {
-        harvesting: {
-          entry: ['harvest'],
-          on: {
-            TRANSITION: {
-              target: 'building',
-              guard: ({ context }: { context: BuilderContext }) =>
-                context.creep.store.getFreeCapacity() === 0,
-            },
+  new SimpleMachine({
+    id: 'builder',
+    initial: 'harvesting',
+    states: {
+      harvesting: {
+        entry: () => creepActions.harvestEnergy(creep),
+        on: {
+          TRANSITION: {
+            target: 'building',
+            guard: () => creep.store.getFreeCapacity() === 0,
           },
         },
-        building: {
-          entry: ['build'],
-          on: {
-            TRANSITION: {
-              target: 'harvesting',
-              guard: ({ context }: { context: BuilderContext }) =>
-                context.creep.store.getUsedCapacity() === 0,
-            },
+      },
+      building: {
+        entry: () => {
+          const target = resolveTarget(creep);
+          if (target) {
+            creepActions.build(creep, target);
+          }
+        },
+        on: {
+          TRANSITION: {
+            target: 'harvesting',
+            guard: () => creep.store.getUsedCapacity() === 0,
           },
         },
       },
     },
-    {
-      actions: {
-        harvest: ({ context }: { context: BuilderContext }) => {
-          creepActions.harvestEnergy(context.creep);
-        },
-        build: ({ context }: { context: BuilderContext }) => {
-          const target = resolveTarget(context.creep);
-          if (target) {
-            creepActions.build(context.creep, target);
-          }
-        },
-      },
-    }
-  );
+  });

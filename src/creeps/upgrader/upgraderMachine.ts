@@ -1,55 +1,28 @@
-import { createMachine } from 'xstate';
+import { SimpleMachine } from '@/creeps/stateMachine';
 import { creepActions } from '@/creeps/creepActions';
 
-interface UpgraderContext {
-  creep: Creep;
-}
-
-type UpgraderEvent = {
-  type: 'TRANSITION';
-};
-
 export const createUpgraderMachine = (creep: Creep) =>
-  createMachine(
-    {
-      id: 'upgrader',
-      initial: 'harvesting',
-      context: { creep },
-      schemas: {
-        context: {} as UpgraderContext,
-        events: {} as UpgraderEvent,
-      },
-      states: {
-        harvesting: {
-          entry: ['harvest'],
-          on: {
-            TRANSITION: {
-              target: 'upgrading',
-              guard: ({ context }: { context: UpgraderContext }) =>
-                context.creep.store.getFreeCapacity() === 0,
-            },
+  new SimpleMachine({
+    id: 'upgrader',
+    initial: 'harvesting',
+    states: {
+      harvesting: {
+        entry: () => creepActions.harvestEnergy(creep),
+        on: {
+          TRANSITION: {
+            target: 'upgrading',
+            guard: () => creep.store.getFreeCapacity() === 0,
           },
         },
-        upgrading: {
-          entry: ['upgrade'],
-          on: {
-            TRANSITION: {
-              target: 'harvesting',
-              guard: ({ context }: { context: UpgraderContext }) =>
-                context.creep.store.getUsedCapacity() === 0,
-            },
+      },
+      upgrading: {
+        entry: () => creepActions.upgradeController(creep),
+        on: {
+          TRANSITION: {
+            target: 'harvesting',
+            guard: () => creep.store.getUsedCapacity() === 0,
           },
         },
       },
     },
-    {
-      actions: {
-        harvest: ({ context }: { context: UpgraderContext }) => {
-          creepActions.harvestEnergy(context.creep);
-        },
-        upgrade: ({ context }: { context: UpgraderContext }) => {
-          creepActions.upgradeController(context.creep);
-        },
-      },
-    }
-  );
+  });
